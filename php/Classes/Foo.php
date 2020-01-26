@@ -162,5 +162,70 @@
 		 //store the email
 		 $this->authorEmail = $newAuthorEmail;
 	 }
-	 
+	 /**
+	  * accessor method for authorHash
+	  *
+	  * @return string value of hash
+	  */
+	 public function getAuthorHash(): string {
+		 return $this->authorHash;
+	 }
+	 /**
+	  * mutator method for author hash
+	  *
+	  * @param string $newAuthorHash
+	  * @throws \InvalidArgumentException if the hash is not secure
+	  * @throws \RangeException if the hash is not 128 characters
+	  * @throws \TypeError if author hash is not a string
+	  */
+	 public function setAuthorHash(string $newAuthorHash): void {
+		 // enforce that the hash is poorly formatted
+		 $newAuthorHash = trim($newAuthorHash);
+		 if(empty($newAuthorHash) === true) {
+			 throw(new \InvalidArgumentException("author hash empty or insecure"));
+		 }
+		 //enforce the hash is really an Argon hash
+		 $newAuthorHash = password_get_info($newAuthorHash);
+		 if($newAuthorHash['algoName'] !== argon2i) {
+			 throw(new \InvalidArgumentException("author hash is not a valid hash"));
+		 }
+		 //enforce that the hash is exactly 97 characters
+		 if(strlen($newAuthorHash) !== 97) {
+			 throw(new \RangeException("author hash must be 97 characters to be valid"));
+		 }
+		 //store this hash
+		 $this->authorHash = $newAuthorHash;
+	 }
+
+	 /**
+	  * accessor method for author username
+	  *
+	  * @return string value of username
+	  */
+	 public function getAuthorUsername(): string {
+		 return $this->authorUsername;
+	 }
+
+	 /**
+	  * mutator method for username
+	  *
+	  * @param string $newAuthorUsername new value of the username
+	  * @throws \InvalidArgumentException if $newAuthorUsername is not a string or insecure
+	  * @throws \RangeException if $newAuthorUsername is > 32 characters
+	  * @throws \TypeError if $newAuthorUsername is not a string
+	  */
+	 public function setAuthorUsername($newAuthorUsername): void {
+	 	//verify the username is secure
+		 $newAuthorUsername = trim($newAuthorUsername);
+		 $newAuthorUsername = filter_var($newAuthorUsername, FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
+		 if(empty($newAuthorUsername) === true) {
+		 	throw (new \InvalidArgumentException("author username is empty or insecure"));
+		 }
+		 //verify the username will fit into the database
+		 if(strlen($newAuthorUsername) > 32) {
+		 	throw(new \RangeException("author username is too long"));
+		 }
+		 //store the username
+		 $this->authorUsername = $newAuthorUsername;
+	 }
  }
