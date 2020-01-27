@@ -1,5 +1,12 @@
 <?php
- /**
+
+namespace rbuchholz425\object-oriented\Author;
+
+require_once ("autoload.php");
+require_once (dirname(object-oriented . "/vendor/autoload.php"));
+
+use Ramsey\Uuid\Uuid;
+/**
   *  Author of something.
   *
   * This Author class will hold the data that it has typed into it.
@@ -8,7 +15,37 @@
   */
 
  class Author {
-	use ValidateUuid;
+
+	 /**
+	  * constructor for Author
+	  * @param string|Uuid $newAuthorId id of this Author or null if a new Author
+	  * @param string $newAuthorActivationToken activation token for Author
+	  * @param string $newAuthorAvatarUrl url for Author avatar
+	  * @param string $newAuthorEmail email of Author
+	  * @param string $newAuthorHash hash password of Author
+	  * @param string $newAuthorUsername username of Author
+	  * @throws \InvalidArgumentException if data types are not valid
+	  * @throws \RangeException if data values are out of set range
+	  * @throws \TypeError if data types violate type hints
+	  * @throws \Exception is some other exception occurs
+	  */
+public function __construct($newAuthorId, $newAuthorActivationToken, $newAuthorAvatarUrl, $newAuthorEmail, $newAuthorHash, $newAuthorUsername) {
+	try {
+		$this->setAuthorId($newAuthorId);
+		$this->setAuthorActivationToken($newAuthorActivationToken);
+		$this->setAuthorAvatarUrl($newAuthorAvatarUrl);
+		$this->setAuthorEmail($newAuthorEmail);
+		$this->setAuthorHash($newAuthorHash);
+		$this->setAuthorUsername($newAuthorUsername);
+		}
+		//determine what exception type was thrown
+	catch(\InvalidArgumentException | \RangeException | \Exception | \TypeError $exception) {
+		$exceptionType = get_class($exception);
+		throw(new $exceptionType($exception->getMessage(), 0, $exception));
+		}
+}
+
+	 use ValidateUuid;
 	/**
 	 * This is the author's Id.
 	 * @var UUid $authorId
