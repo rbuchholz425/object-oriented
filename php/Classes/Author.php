@@ -1,6 +1,6 @@
 <?php
 
-namespace rbuchholz425\object-oriented\Author;
+namespace rbuchholz425\objectOriented;
 
 require_once ("autoload.php");
 require_once (dirname(object-oriented . "/vendor/autoload.php"));
@@ -44,7 +44,7 @@ public function __construct($newAuthorId, $newAuthorActivationToken, $newAuthorA
 		throw(new $exceptionType($exception->getMessage(), 0, $exception));
 		}
 }
-
+	 use ValidateDate;
 	 use ValidateUuid;
 	/**
 	 * This is the author's Id.
@@ -85,7 +85,7 @@ public function __construct($newAuthorId, $newAuthorActivationToken, $newAuthorA
 	 /**
 	  * @return UUid
 	  */
-	 public function getAuthorId(): UUid {
+	 public function getAuthorId(): Uuid {
 		 return $this->authorId;
 	 }
 
@@ -159,7 +159,7 @@ public function __construct($newAuthorId, $newAuthorActivationToken, $newAuthorA
 		 $newAuthorAvatarUrl = trim($newAuthorAvatarUrl);
 		 $newAuthorAvatarUrl = filter_var($newAuthorAvatarUrl, FILTER_SANITIZE_STRING);
 		 if(empty($newAuthorAvatarUrl) === true) {
-		 	throw (new \InvalidArgumentException("Avatar Url empty or insecure"))
+		 	throw (new \InvalidArgumentException("Avatar Url empty or insecure"));
 		 }
 		 //verify that the Avatar will fit in the database
 		 if(strlen($newAuthorAvatarUrl) > 100) {
