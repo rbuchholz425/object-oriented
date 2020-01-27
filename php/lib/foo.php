@@ -1,11 +1,13 @@
 <?php
 
-namespace rbuchholz425\objectOriented;
+namespace rbuchholz425\ObjectOriented;
 
 require_once (dirname(__DIR__) . "/Classes/autoload.php");
 
-use Ramsey\Uuid\Uuid, rbuchholz425\objectOriented\Author;
+use rbuchholz425\ObjectOriented\Author;
 
-$newAuthor = new Author("0850d78d-0ff3-402d-a783-273385ef778d", "authorToken", "myprofilepic.com", "author1234@gmail.com", "password", "JRRTolkien");
+$hash = password_hash("password", PASSWORD_ARGON2I, ["time_cost" => 7]);
+
+$newAuthor = new Author("0850d78d-0ff3-402d-a783-273385ef778d", "12345678901234567890123456789012", "myprofilepic.com", "author1234@gmail.com", $hash, "JRRTolkien");
 
 echo $newAuthor->getAuthorUsername();

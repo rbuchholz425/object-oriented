@@ -1,9 +1,9 @@
 <?php
 
-namespace rbuchholz425\objectOriented;
+namespace rbuchholz425\ObjectOriented;
 
 require_once ("autoload.php");
-require_once (dirname(object-oriented . "/vendor/autoload.php"));
+require_once (dirname(__DIR__) . "/vendor/autoload.php");
 
 use Ramsey\Uuid\Uuid;
 /**
@@ -14,8 +14,9 @@ use Ramsey\Uuid\Uuid;
   * @author Ryan Buchholz <rbuchholz1>
   */
 
- class Author {
-
+ class Author implements \JsonSerializable {
+	 use ValidateDate;
+	 use ValidateUuid;
 	 /**
 	  * constructor for Author
 	  * @param string|Uuid $newAuthorId id of this Author or null if a new Author
@@ -44,8 +45,6 @@ public function __construct($newAuthorId, $newAuthorActivationToken, $newAuthorA
 		throw(new $exceptionType($exception->getMessage(), 0, $exception));
 		}
 }
-	 use ValidateDate;
-	 use ValidateUuid;
 	/**
 	 * This is the author's Id.
 	 * @var UUid $authorId
@@ -53,7 +52,7 @@ public function __construct($newAuthorId, $newAuthorActivationToken, $newAuthorA
 	private $authorId;
 	/**
 	 * This is the author's activation token for their account.
-	 * @var$authorActivationToken
+	 * @var $authorActivationToken
 	 */
 	private $authorActivationToken;
 	/**
@@ -123,7 +122,7 @@ public function __construct($newAuthorId, $newAuthorActivationToken, $newAuthorA
 	  * @throws \RangeException if the token is not exactly 32 characters
 	  * @throws \TypeError if the activation token is not a string
 	  **/
-	 public function setAuthorActivationToken(?string $newAuthorActivationToken): void {
+	 public function setAuthorActivationToken(string $newAuthorActivationToken): void {
 		 if($newAuthorActivationToken ===  null) {
 		 	$this->authorActivationToken = null;
 		 	return;
@@ -222,12 +221,12 @@ public function __construct($newAuthorId, $newAuthorActivationToken, $newAuthorA
 			 throw(new \InvalidArgumentException("author hash empty or insecure"));
 		 }
 		 //enforce the hash is really an Argon hash
-		 $newAuthorHash = password_get_info($newAuthorHash);
-		 if($newAuthorHash['algoName'] !== argon2i) {
+		 $authorHashInfo = password_get_info($newAuthorHash);
+		 if($authorHashInfo["algoName"] !== "argon2i") {
 			 throw(new \InvalidArgumentException("author hash is not a valid hash"));
 		 }
 		 //enforce that the hash is exactly 97 characters
-		 if(strlen($newAuthorHash) !== 97) {
+		 if(strlen($newAuthorHash) > 97) {
 			 throw(new \RangeException("author hash must be 97 characters to be valid"));
 		 }
 		 //store this hash
@@ -264,5 +263,10 @@ public function __construct($newAuthorId, $newAuthorActivationToken, $newAuthorA
 		 }
 		 //store the username
 		 $this->authorUsername = $newAuthorUsername;
+	 }
+	 public function jsonSerialize() : array {
+		 $fields = get_object_vars($this);
+		 $fields["authorId"] = $this->authorId->toString();
+		 return($fields);
 	 }
  }
