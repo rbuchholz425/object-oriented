@@ -137,7 +137,7 @@
 	  *
 	  * @return string value of email
 	  */
-	 public function getAuthorEmail() {
+	 public function getAuthorEmail(): string {
 		 return $this->authorEmail;
 	 }
 	/**
