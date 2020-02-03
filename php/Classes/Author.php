@@ -264,6 +264,61 @@ public function __construct($newAuthorId, $newAuthorActivationToken, $newAuthorA
 		 //store the username
 		 $this->authorUsername = $newAuthorUsername;
 	 }
+
+	 /**
+	  * inserts this Author into MySQL
+	  *
+	  * @param \PDO $pdo PDO connection object
+	  * @throws \PDOException when MySQL related errors occur
+	  * @throws \TypeError if $pdo is not a PDO connection onject
+	  **/
+	 public function  insert(\PDO $pdo) : void {
+	 	//create query template
+		 $query = "INSERT INTO author(authorId, authorActivationToken, authorAvatarUrl, authorEmail, authorHash, authorUsername) VALUES (:authorId, :authorActivationToken, :authorAvatarUrl, :authorEmail, :authorHash, :authorUsername)";
+		 $statement = $pdo->prepare($query);
+
+		 //bind the member variables to the place holders in the template
+		 $parameters = ["authorId" => $this->authorId->getBytes(), "authorActivationToken" => $this->authorActivationToken, "authorAvatarUrl"=> $this->authorAvatarUrl, "authorEmail" =>$this->authorEmail, "authorHash" => $this->authorHash, "auhtorUsername" => $this->authorUsername];
+		 $statement->execute($parameters);
+	 }
+
+	 /**
+	  * updates this Author in MySQL
+	  *
+	  * @param \PDO $pdo PDO connection object
+	  * @throws \PDOException when MySQL related errors occur
+	  * @throws \TypeError if $pdo is not a PDO connection object
+	  **/
+	 public function update(\PDO $pdo) : void {
+	 	//create query template
+		 $query = "UPDATE author SET authorId = :authorId, authorActivationToken = :authorActivationToken, authorAvatarUrl = :auhtorAvatarUrl, authorEmail = :authorEmail, authorHash = :authorHash, authorUsernam = :authorUsername WHERE authorId = :authroId";
+		$statement = $pdo->prepare($query);
+
+		 $parameters = ["authorId" => $this->authorId->getBytes(), "authorActivationToken" => $this->authorActivationToken, "authorAvatarUrl"=> $this->authorAvatarUrl, "authorEmail" =>$this->authorEmail, "authorHash" => $this->authorHash, "auhtorUsername" => $this->authorUsername];
+		 $statement->execute($parameters);
+	 }
+
+	 /**
+	  * deletes this Author from mySQL
+	  *
+	  * @param \PDO $pdo PDO connection object
+	  * @throws \PDOException when mySQL related errors occur
+	  * @throws \TypeError if $pdo is not a PDO connection object
+	  **/
+	 public function delete(\PDO $pdo) : void {
+
+		 // create query template
+		 $query = "DELETE FROM Author WHERE authorId = :authorId, authorActivationToken = :authorActivationToken, authorAvatarUrl = :auhtorAvatarUrl, authorEmail = :authorEmail, authorHash = :authorHash, authorUsername = :authorUsername";
+		 $statement = $pdo->prepare($query);
+
+		 // bind the member variables to the place holder in the template
+		 $parameters = ["authorId" => $this->authorId->getBytes(), "authorActivationToken" => $this->authorActivationToken, "authorAvatarUrl"=> $this->authorAvatarUrl, "authorEmail" =>$this->authorEmail, "authorHash" => $this->authorHash, "auhtorUsername" => $this->authorUsername];
+		 $statement->execute($parameters);
+
+
+	 /**
+	  * @return array
+	  */
 	 public function jsonSerialize() : array {
 		 $fields = get_object_vars($this);
 		 $fields["authorId"] = $this->authorId->toString();
