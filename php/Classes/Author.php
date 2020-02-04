@@ -267,6 +267,10 @@ public function __construct($newAuthorId, $newAuthorActivationToken, $newAuthorA
 	 }
 
 	 /**
+	  * What follows below is Phase II for the in class OOP Project:
+	  */
+
+	 /**
 	  * inserts this Author into MySQL
 	  *
 	  * @param \PDO $pdo PDO connection object
@@ -364,14 +368,14 @@ public function __construct($newAuthorId, $newAuthorActivationToken, $newAuthorA
 	  * @throws \PDOException when MySQL related errors occur
 	  * @throws \TypeError when variables are not the correct data type
 	  **/
-	 public static function getAuthorByAuthorIdArray(\PDO $pdo, $authorId) : \SplFixedArray {
+	 public static function getAuthorByUsername(\PDO $pdo, $authorId) : \SplFixedArray {
 	 	try {
 	 			$authorId = self::validateUuid($authorId);
 		} catch(\InvalidArgumentException | \RangeException | \Exception | \TypeError $exception) {
 	 		throw(new \PDOException($exception->getMessage(), 0 , $exception));
 		}
 		//create query template
-		 $query = "SELECT authorId, authorActivationToken, authorAvatarUrl, authorEmail, authorHash, authorUsername FROM author WHERE authorId = :authorId";
+		 $query = "SELECT authorId, authorActivationToken, authorAvatarUrl, authorEmail, authorHash, authorUsername FROM authorUsername WHERE authorUsername LIKE :authorUserName";
 	 	 $statement = $pdo->prepare($query);
 	 	 //bind the author id to the place holder in the template
 		 $parameters = ["authorId" => $authorId->getBytes()];
