@@ -299,21 +299,21 @@ public function __construct($newAuthorId, $newAuthorActivationToken, $newAuthorA
 	 }
 
 	 /**
-	  * deletes this Author from mySQL
+	  * deletes a author form MySQL
 	  *
 	  * @param \PDO $pdo PDO connection object
-	  * @throws \PDOException when mySQL related errors occur
+	  * @throws \PDOException when MySQL related erros occur
 	  * @throws \TypeError if $pdo is not a PDO connection object
-	  **/
+	  */
 	 public function delete(\PDO $pdo) : void {
-
-		 // create query template
-		 $query = "DELETE FROM Author WHERE authorId = :authorId, authorActivationToken = :authorActivationToken, authorAvatarUrl = :auhtorAvatarUrl, authorEmail = :authorEmail, authorHash = :authorHash, authorUsername = :authorUsername";
+	 	//create query template
+		 $query = "DELETE FROM Author WHERE authorId = :authorId";
 		 $statement = $pdo->prepare($query);
 
-		 // bind the member variables to the place holder in the template
-		 $parameters = ["authorId" => $this->authorId->getBytes(), "authorActivationToken" => $this->authorActivationToken, "authorAvatarUrl"=> $this->authorAvatarUrl, "authorEmail" =>$this->authorEmail, "authorHash" => $this->authorHash, "auhtorUsername" => $this->authorUsername];
+		 //bind the member variables to the place holder in the template
+		 $parameters = ["authorId" => $this->authorId->getBytes()];
 		 $statement->execute($parameters);
+	 }
 
 
 	 /**
