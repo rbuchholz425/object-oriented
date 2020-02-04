@@ -5,6 +5,7 @@ namespace rbuchholz425\ObjectOriented;
 require_once ("autoload.php");
 require_once (dirname(__DIR__) . "/vendor/autoload.php");
 
+use http\Encoding\Stream;
 use Ramsey\Uuid\Uuid;
 /**
   *  Author of something.
@@ -278,7 +279,7 @@ public function __construct($newAuthorId, $newAuthorActivationToken, $newAuthorA
 		 $statement = $pdo->prepare($query);
 
 		 //bind the member variables to the place holders in the template
-		 $parameters = ["authorId" => $this->authorId->getBytes(), "authorActivationToken" => $this->authorActivationToken, "authorAvatarUrl"=> $this->authorAvatarUrl, "authorEmail" =>$this->authorEmail, "authorHash" => $this->authorHash, "auhtorUsername" => $this->authorUsername];
+		 $parameters = ["authorId" => $this->authorId->getBytes(), "authorActivationToken" => $this->authorActivationToken, "authorAvatarUrl"=> $this->authorAvatarUrl, "authorEmail" =>$this->authorEmail, "authorHash" => $this->authorHash, "authorUsername" => $this->authorUsername];
 		 $statement->execute($parameters);
 	 }
 
@@ -291,7 +292,7 @@ public function __construct($newAuthorId, $newAuthorActivationToken, $newAuthorA
 	  **/
 	 public function update(\PDO $pdo) : void {
 	 	//create query template
-		 $query = "UPDATE author SET authorId = :authorId, authorActivationToken = :authorActivationToken, authorAvatarUrl = :auhtorAvatarUrl, authorEmail = :authorEmail, authorHash = :authorHash, authorUsernam = :authorUsername WHERE authorId = :authroId";
+		 $query = "UPDATE author SET authorId = :authorId, authorActivationToken = :authorActivationToken, authorAvatarUrl = :auhtorAvatarUrl, authorEmail = :authorEmail, authorHash = :authorHash, authorUsername = :authorUsername WHERE authorId = :authorId";
 		$statement = $pdo->prepare($query);
 
 		 $parameters = ["authorId" => $this->authorId->getBytes(), "authorActivationToken" => $this->authorActivationToken, "authorAvatarUrl"=> $this->authorAvatarUrl, "authorEmail" =>$this->authorEmail, "authorHash" => $this->authorHash, "auhtorUsername" => $this->authorUsername];
@@ -315,6 +316,44 @@ public function __construct($newAuthorId, $newAuthorActivationToken, $newAuthorA
 		 $statement->execute($parameters);
 	 }
 
+	 /**
+	  *gets the Author by authorId
+	  *
+	  *@param \PDO $pdo PDO connection object
+	  *@param Uuid|string $authorId author id to search for
+	  *@return Author|null Author found or null if not found
+	  *@throws \PDOException when MySQL related errors occur
+	  *@throws \TypeError when a variable is not the correct data type
+	  **/
+	 public static function getAuthorByAuthorId(\PDO $pdo, $authorId) : ?Author {
+	 	//sanitize the authorId before searching
+	 try {
+	 		$authorId = self::ValidateUuid($authorId);
+	 } catch(\InvalidArgumentException | \RangeException | \Exception | \TypeError $exception) {
+	 			throw(new \PDOException($exception->getMessage(), 0, $exception));
+	 }
+	 //create query template
+	 $query = "SELECT authorId, authorActivationToken, authorAvatarUrl, authorEmail, authorHash, authorUsername FROM Author WHERE authorId = :authorId";
+	 $statement =$pdo->prepare($query);
+
+	 //bind the author id to the place holder in the template
+	 $parameters = ["authorId" => $authorId->getBytes()];
+	 $statement->execute($parameters);
+
+	 //grab the author from MySQL
+	 try {
+	 	$author = null;
+	 	$statement->setFetchMode(\PDO::FETCH_ASSOC);
+	 	$row = $statement->fetch();
+	 	if($row !== false) {
+	 		$author = new Author($row["authorId"], $row["authorActivationToken"], $row["authorAvatarUrl"], $row["authorEmail"], $row["authorHash"], $row["authorUsername"]);
+		}
+	 } catch(\Exception $exception) {
+	 	//if the row couldn't be converted, rethrow it
+		 throw(new \PDOException($exception->getMessage(), 0, $exception));
+	 }
+	 return ($author);
+ }
 
 	 /**
 	  * @return array
