@@ -363,37 +363,44 @@ public function __construct($newAuthorId, $newAuthorActivationToken, $newAuthorA
 	  * gets the Author by the author id
 	  *
 	  * @param \PDO $pdo PDO connection object
-	  * @param Uuid|string $authorId author id to search by
+	  * @param string authorUsername authorUsername to search by
 	  * @return \SplFixedArray SplFixedArray of Authors found
 	  * @throws \PDOException when MySQL related errors occur
 	  * @throws \TypeError when variables are not the correct data type
 	  **/
-	 public static function getAuthorByUsername(\PDO $pdo, $authorId) : \SplFixedArray {
-	 	try {
-	 			$authorId = self::validateUuid($authorId);
-		} catch(\InvalidArgumentException | \RangeException | \Exception | \TypeError $exception) {
-	 		throw(new \PDOException($exception->getMessage(), 0 , $exception));
-		}
+	 public static function getAuthorByAuthorUsername(\PDO $pdo, string $authorUsername) : \SplFixedArray {
+
+	 	//sanitize the description before searching
+		 $authorUsername = trim($authorUsername);
+		 $authorUsername = filter_var($authorUsername, FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
+
+		 //escape anyMySQL wilds cards
+		 $result = str_replace("%", "\\%", $authorUsername);
+		 $authorUsername = str_replace("_", "\\_", $result);
+
 		//create query template
-		 $query = "SELECT authorId, authorActivationToken, authorAvatarUrl, authorEmail, authorHash, authorUsername FROM authorUsername WHERE authorUsername LIKE :authorUserName";
+		 $query = "SELECT authorId, authorActivationToken, authorAvatarUrl, authorEmail, authorHash, authorUsername FROM Author WHERE authorUsername LIKE :authorUserName";
 	 	 $statement = $pdo->prepare($query);
-	 	 //bind the author id to the place holder in the template
-		 $parameters = ["authorId" => $authorId->getBytes()];
+
+	 	 //bind the author username to the place holder in the template
+		 $authorUsername = "%$authorUsername%";
+		 $parameters = ["authorUsername" => $authorUsername];
 		 $statement->execute($parameters);
+
 		 //build an array of authors
-		 $authors = new \SplFixedArray($statement->rowCount());
+		 $authorArray = new \SplFixedArray($statement->rowCount());
 		 $statement->setFetchMode(\PDO::FETCH_ASSOC);
 		 while(($row = $statement->fetch()) !== false) {
 		 	try {
 		 		$author = new Author($row["authorId"], $row["authorActivationToken"], $row["authorAvatarUrl"], $row["authorEmail"], $row["authorHash"], $row["authorUsername"]);
-		 		$authors[$authors->key()] = $author;
-		 		$authors->next();
+		 		$authorArray[$authorArray->key()] = $author;
+		 		$authorArray->next();
 			} catch(\Exception $exception) {
 		 		//if the row couldn't be converted, rethrow it
 				throw(new \PDOException($exception->getMessage(), 0 ,$exception));
 			}
 		 }
-		 return($authors);
+		 return($authorArray);
 	 }
 
 	 /**
